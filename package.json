@@ -1,0 +1,16 @@
+{
+  "name": "image-resizer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:xonlly/image-resizer.git",
+  "author": "Marvin SANT <contact@devteck.eu>",
+  "license": "MIT",
+  "dependencies": {
+    "inkjet": "^2.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^9.3.0",
+    "eslint": "^4.15.0",
+    "typescript-eslint-parser": "^11.0.0"
+  }
+}
