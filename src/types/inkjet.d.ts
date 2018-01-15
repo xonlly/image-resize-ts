@@ -1,19 +1,17 @@
 export function decode(
   buf: Buffer,
-  options: object,
-  cb: (buf: Buffer) => void,
+  cb: (err: object | boolean, decoded: Buffer) => void,
 ): void;
 
 export function encode(
   buf: Buffer,
   options: object,
-  cb: (buf: Buffer) => void,
+  cb: (err: object | boolean, encoded: Buffer) => void,
 ): any;
 
 export function exif(
   buf: Buffer,
-  options: object,
-  cb: (buf: Buffer) => void,
+  cb: (err: object | boolean, metadata: object) => void,
 ): void;
 
 export function info(buf: Buffer, cb: () => void): void;

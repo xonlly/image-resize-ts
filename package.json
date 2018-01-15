@@ -5,6 +5,10 @@
   "repository": "git@github.com:xonlly/image-resizer.git",
   "author": "Marvin SANT <contact@devteck.eu>",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc -w"
+  },
   "dependencies": {
     "inkjet": "^2.1.2"
   },
