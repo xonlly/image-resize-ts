@@ -1,0 +1,1 @@
+{"version":3,"file":"index.spec.js","sourceRoot":"","sources":["../src/index.spec.ts"],"names":[],"mappings":";;;;;;;;;;;IACA,yBAAyB;IAEzB,QAAQ,CAAC,eAAe,EAAE,GAAG,EAAE;QAC7B,EAAE,CAAC,iCAAiC,EAAE,GAAG,EAAE;YACzC,OAAO,CAAC,GAAG,CAAC,SAAS,EAAE,UAAO,CAAC,CAAC;YAEhC,MAAM,CAAC,IAAI,CAAC,CAAC,IAAI,CAAC,IAAI,CAAC,CAAC;QAC1B,CAAC,CAAC,CAAC;IACL,CAAC,CAAC,CAAC"}

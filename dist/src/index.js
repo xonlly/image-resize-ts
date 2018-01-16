@@ -6,18 +6,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "inkjet"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "inkjet"], function (require, exports, inkjet_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const inkjet_1 = require("inkjet");
     const EXIF_TRANSFORMS = {
         1: { rotate: 0, flip: false },
         2: { rotate: 0, flip: true },
