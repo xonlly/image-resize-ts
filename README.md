@@ -1,1 +1,3 @@
-dts-gen to generate module types
+# Client image resizer
+
+## WIP

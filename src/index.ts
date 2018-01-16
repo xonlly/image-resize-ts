@@ -86,7 +86,6 @@ const createImage = (binary: Buffer): Promise<HTMLImageElement> =>
     image.onload = () => resolve(image);
   });
 
-
 const rotateAndResize = async (
   inkjetImage: any,
   exifOrientationId: number,
@@ -127,7 +126,6 @@ const rotateAndResize = async (
 
   return inkjetImage.data;
 };
-
 
 const Resizer = async (binary: Buffer, quality = 100, maxWidth = 800) => {
   try {
