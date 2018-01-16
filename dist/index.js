@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const inkjet_1 = require("inkjet");
 const EXIF_TRANSFORMS = {
@@ -57,5 +65,52 @@ const getCanvasForImage = (image, // TODO: need update for this
     canvas.height = h;
     return canvas;
 };
-console.log('inkjet', inkjet_1.default, EXIF_TRANSFORMS);
+const createImage = (binary) => new Promise(resolve => {
+    const blob = new Blob([binary]);
+    const image = new Image();
+    image.src = URL.createObjectURL(blob);
+    image.onload = () => resolve(image);
+});
+const rotateAndResize = (inkjetImage, exifOrientationId, maxWidth = 800) => __awaiter(this, void 0, void 0, function* () {
+    if (!EXIF_TRANSFORMS[exifOrientationId])
+        return inkjetImage;
+    const canvas = getCanvasForImage(inkjetImage, maxWidth);
+    const image = yield createImage(inkjetImage.data);
+    const w = canvas.width;
+    const h = canvas.height;
+    if (exifOrientationId > 4) {
+        const temp = canvas.width;
+        canvas.width = canvas.height;
+        canvas.height = temp;
+    }
+    const ctx = exifTransformCanvas(canvas.getContext('2d'), exifOrientationId);
+    ctx.drawImage(image, 0, 0, inkjetImage.width, inkjetImage.height, -w / 2, -h / 2, w, h);
+    if (typeof canvas.toBlob !== 'undefined') {
+        return new Promise(resolve => canvas.toBlob(resolve));
+    }
+    else if (typeof canvas.msToBlob !== 'undefined') {
+        return canvas.msToBlob();
+    }
+    return inkjetImage.data;
+});
+const Resizer = (binary, quality = 100, maxWidth = 800) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const { data, width, height } = yield inkjetPromised.decode(binary);
+        const imageEncoded = yield inkjetPromised.encode(data, {
+            quality,
+            width,
+            height,
+        });
+        const metadata = yield inkjetPromised.exif(binary);
+        let orientation = 1;
+        if (metadata.Orientation)
+            orientation = metadata.Orientation.value;
+        const image = yield rotateAndResize(imageEncoded, orientation, maxWidth);
+        return image;
+    }
+    catch (e) {
+        return binary;
+    }
+});
+exports.default = Resizer;
 //# sourceMappingURL=index.js.map

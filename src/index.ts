@@ -13,13 +13,13 @@ const EXIF_TRANSFORMS: any = {
 
 let inkjetPromised = {
   decode: (buf: Buffer) =>
-    new Promise<Buffer>((resolve, reject) =>
+    new Promise<any>((resolve, reject) =>
       inkjet.decode(buf, (err, decoded) => {
         if (err) return reject(err);
         return resolve(decoded);
       }),
     ),
-  encode: (buf: Buffer, options: object) =>
+  encode: (buf: Buffer, options?: object) =>
     new Promise<Buffer>((resolve, reject) =>
       inkjet.encode(buf, options, (err, encoded) => {
         if (err) return reject(err);
@@ -27,7 +27,7 @@ let inkjetPromised = {
       }),
     ),
   exif: (buf: Buffer) =>
-    new Promise<object>((resolve, reject) =>
+    new Promise<any>((resolve, reject) =>
       inkjet.exif(buf, (err, metadata) => {
         if (err) return reject(err);
         return resolve(metadata);
@@ -78,4 +78,75 @@ const getCanvasForImage = (
   return canvas;
 };
 
-console.log('inkjet', inkjet, EXIF_TRANSFORMS);
+const createImage = (binary: Buffer): Promise<HTMLImageElement> =>
+  new Promise<HTMLImageElement>(resolve => {
+    const blob = new Blob([binary]);
+    const image = new Image();
+    image.src = URL.createObjectURL(blob);
+    image.onload = () => resolve(image);
+  });
+
+
+const rotateAndResize = async (
+  inkjetImage: any,
+  exifOrientationId: number,
+  maxWidth = 800,
+): Promise<Buffer | Blob | object> => {
+  if (!EXIF_TRANSFORMS[exifOrientationId]) return inkjetImage;
+
+  const canvas = getCanvasForImage(inkjetImage, maxWidth);
+  const image = await createImage(inkjetImage.data);
+  const w = canvas.width;
+  const h = canvas.height;
+
+  if (exifOrientationId > 4) {
+    const temp = canvas.width;
+    canvas.width = canvas.height;
+    canvas.height = temp;
+  }
+
+  const ctx = exifTransformCanvas(canvas.getContext('2d'), exifOrientationId);
+
+  ctx.drawImage(
+    image,
+    0,
+    0,
+    inkjetImage.width,
+    inkjetImage.height,
+    -w / 2,
+    -h / 2,
+    w,
+    h,
+  );
+
+  if (typeof canvas.toBlob !== 'undefined') {
+    return new Promise(resolve => canvas.toBlob(resolve));
+  } else if (typeof canvas.msToBlob !== 'undefined') {
+    return canvas.msToBlob();
+  }
+
+  return inkjetImage.data;
+};
+
+
+const Resizer = async (binary: Buffer, quality = 100, maxWidth = 800) => {
+  try {
+    const { data, width, height } = await inkjetPromised.decode(binary);
+    const imageEncoded = await inkjetPromised.encode(data, {
+      quality,
+      width,
+      height,
+    });
+
+    const metadata = await inkjetPromised.exif(binary);
+    let orientation = 1;
+    if (metadata.Orientation) orientation = metadata.Orientation.value;
+
+    const image = await rotateAndResize(imageEncoded, orientation, maxWidth);
+    return image;
+  } catch (e) {
+    return binary;
+  }
+};
+
+export default Resizer;
